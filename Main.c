@@ -70,20 +70,27 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
 {
     printf("\033[32m Data received.\n\r\033[0m");
 
+    // Remote client closes connection
     if (p == NULL)
     {
-        printf("p==NULL,Closing connection\n\r");
+        printf("p==NULL,Closing connection, request client\n\r");
         tcp_close(tpcb);
-}
+
         return ERR_OK;
     }
     else if(err != ERR_OK)
     {
-        printf("Received error.\n\r");
+        printf("\033[91mReceived error.\033[0m1\n\r");
         return err;
     }
     printf("Received Data len: %d\n\r", p->tot_len);
-
+    printf("Data: ");
+    for (int i = 0; i < p->tot_len; i++)
+    {
+        uint8_t byte = *(uint8_t*)(p->payload+i);
+        printf("%02x ", byte);
+    }
+    printf("\n\r");
 
     tcp_recved(tpcb, p->tot_len);
     pbuf_free(p);
