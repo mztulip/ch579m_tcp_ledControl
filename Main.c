@@ -6,7 +6,7 @@
 #include "timer0.h"
 #include "lwipcomm.h"
 #include "lwip/timeouts.h"
-#include "udp.h"
+#include "tcp.h"
 
 void uart_init(void)		
 {
@@ -31,38 +31,38 @@ void led_off(void)
     GPIOB_ResetBits( GPIO_Pin_0 );
 }
 
-static void udp_received(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
-{
-    LWIP_UNUSED_ARG(arg);
-    if(p == NULL)
-        return;
-    printf("\n\rgot udp");
-    if (p->len == 1)
-    {
-        uint8_t *data = (uint8_t*)p->payload;
-        char c = data[0];
-        if(c == '1')
-        {
-            led_on();
-            printf("\n\rLed enabled.");
-        }
-        else if(c == '0')
-        {
-            led_off();
-            printf("\n\rLed disabled.");
-        }
-        else
-        {
-            printf("\n\rIncorrect state: %c", c);
-        }
-    }
-    else
-    {
-        printf("\n\rIncorrect packet. Should contain char 0 or 1 with length=1 byte");
-    }
+// static void udp_received(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
+// {
+//     LWIP_UNUSED_ARG(arg);
+//     if(p == NULL)
+//         return;
+//     printf("\n\rgot udp");
+//     if (p->len == 1)
+//     {
+//         uint8_t *data = (uint8_t*)p->payload;
+//         char c = data[0];
+//         if(c == '1')
+//         {
+//             led_on();
+//             printf("\n\rLed enabled.");
+//         }
+//         else if(c == '0')
+//         {
+//             led_off();
+//             printf("\n\rLed disabled.");
+//         }
+//         else
+//         {
+//             printf("\n\rIncorrect state: %c", c);
+//         }
+//     }
+//     else
+//     {
+//         printf("\n\rIncorrect packet. Should contain char 0 or 1 with length=1 byte");
+//     }
     
-    pbuf_free(p);
-}
+//     pbuf_free(p);
+// }
 
 int main()
 { 
@@ -75,18 +75,17 @@ int main()
     led_init();
     InitTimer0();
     uart_init();
-    printf("\n\rUDP server example with led control.\n");
+    printf("\n\rTCP server example with led control.\n");
     lwip_comm_init(); 
 
     u16_t   port = 8001;
     printf("\n\rListening port: %d\n", port);
-    struct udp_pcb *pcb;
+    static struct tcp_pcb *tcp_pcb_handle;
     err_t result;
-    pcb = udp_new();
-    result = udp_bind(pcb, IP_ADDR_ANY, port);
-    if(result != ERR_OK) {printf("\n\rudp_bind failed");goto exit;}
-
-	udp_recv(pcb , udp_received, NULL);
+    tcp_pcb_handle = tcp_new();
+    if(tcp_pcb_handle == NULL){printf("\n\rtcp_new failed");goto exit;}
+    result = tcp_bind(tcp_pcb_handle, IP_ADDR_ANY, port);
+    if(result != ERR_OK) {printf("\n\tcp_bind failed");goto exit;}
 
     exit:
     while(1)
