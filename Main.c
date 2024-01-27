@@ -8,6 +8,8 @@
 #include "lwip/timeouts.h"
 #include "tcp.h"
 
+uint32_t arg = 0;
+
 void uart_init(void)		
 {
     GPIOA_SetBits(GPIO_Pin_9);
@@ -66,36 +68,45 @@ void led_off(void)
 
 static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
 {
-    printf("\n\tData received.");
+    printf("Data received.\n\t");
 
     if (p == NULL)
     {
-        printf("Closing connection");
+        printf("p==NULL,Closing connection\n\r");
+        return ERR_ABRT;
     }
     else if(err != ERR_OK)
     {
-        printf("\n\rReceived error.");
+        printf("Received error.\n\r");
+        return ERR_ABRT;
     }
+    printf("Received Data len: %d\n\r", p->tot_len);
+
+    tcp_recved(tpcb, p->tot_len);
+    pbuf_free(p);
+    return ERR_OK;
 }
 
 static void tcp_connection_error(void *arg, err_t err)
 {
-  printf("\n\rtcp connection fatal Error. Maybe memory shortage.");
+  printf("tcp connection fatal Error. Maybe memory shortage.\n\r");
 }
 
 static err_t tcp_connection_poll(void *arg, struct tcp_pcb *tpcb)
 {
-    printf("\n\rTCP poll. Aborting connection.");
+    printf("TCP poll. Aborting connection.\n\r");
     tcp_abort(tpcb);
     return ERR_ABRT;
 }
 
 static err_t tcp_connection_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
-    printf("\n\rConnection accepted.");
+    printf("Connection accepted.\n\r");
+    tcp_arg(newpcb, &arg);
     tcp_recv(newpcb, tcp_data_received);
     tcp_err(newpcb, tcp_connection_error);
-    tcp_poll(newpcb, tcp_connection_poll, 0);
+    tcp_poll(newpcb, tcp_connection_poll, 10);
+    return ERR_OK;
 }
 
 // Very helpful link https://lwip.fandom.com/wiki/Raw/TCP
@@ -110,22 +121,22 @@ int main()
     led_init();
     InitTimer0();
     uart_init();
-    printf("\n\rTCP server example with led control.\n");
+    printf("\n\rTCP server example with led control.\n\r");
     lwip_comm_init(); 
 
     u16_t   port = 8001;
-    printf("\n\rListening port: %d\n", port);
+    printf("Listening port: %d\nr", port);
     static struct tcp_pcb *tcp_pcb_handle;
     err_t result;
     tcp_pcb_handle = tcp_new();
-    if(tcp_pcb_handle == NULL){printf("\n\rtcp_new failed");goto exit;}
+    if(tcp_pcb_handle == NULL){printf("tcp_new failed\n\r");goto exit;}
 
     result = tcp_bind(tcp_pcb_handle, IP_ADDR_ANY, port);
     if(result != ERR_OK) 
-    {printf("\n\tcp_bind failed");memp_free(MEMP_TCP_PCB, tcp_pcb_handle);goto exit;}
+    {printf("tcp_bind failed\n\r");memp_free(MEMP_TCP_PCB, tcp_pcb_handle);goto exit;}
 
     tcp_pcb_handle = tcp_listen(tcp_pcb_handle);
-    if(tcp_pcb_handle == NULL){printf("\n\tcp_listen failed");memp_free(MEMP_TCP_PCB, tcp_pcb_handle);goto exit;}
+    if(tcp_pcb_handle == NULL){printf("tcp_listen failed\n\r");memp_free(MEMP_TCP_PCB, tcp_pcb_handle);goto exit;}
       
     tcp_accept(tcp_pcb_handle, tcp_connection_accept);
 
