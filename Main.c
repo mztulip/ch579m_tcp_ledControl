@@ -68,7 +68,7 @@ void led_off(void)
 
 static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
 {
-    printf("Data received.\n\t");
+    printf("\033[32m Data received.\n\r\033[0m");
 
     if (p == NULL)
     {
@@ -89,19 +89,18 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
 
 static void tcp_connection_error(void *arg, err_t err)
 {
-  printf("tcp connection fatal Error. Maybe memory shortage.\n\r");
+  printf("\033[91mtcp connection fatal Error. Maybe memory shortage.\033[0m\n\r");
 }
 
 static err_t tcp_connection_poll(void *arg, struct tcp_pcb *tpcb)
 {
-    printf("TCP poll. Aborting connection.\n\r");
-    tcp_abort(tpcb);
-    return ERR_ABRT;
+    printf("\033[33mTCP poll\n\r\033");
+    return ERR_OK;
 }
 
 static err_t tcp_connection_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
-    printf("Connection accepted.\n\r");
+    printf("\033[32m Connection accepted.\n\r\033[0m");
     tcp_arg(newpcb, &arg);
     tcp_recv(newpcb, tcp_data_received);
     tcp_err(newpcb, tcp_connection_error);
