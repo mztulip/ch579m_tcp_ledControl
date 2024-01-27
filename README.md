@@ -12,8 +12,8 @@ make.sh
 Led can be controlled using UDP packet.
 On Linux machine packets can be send as below:
 ```
-echo -n "1" > /dev/udp/192.168.2.235/8001
-echo -n "0" > /dev/udp/192.168.2.235/8001
+echo -n "1" > /dev/tcp/192.168.2.235/8001
+echo -n "0" > /dev/tcp/192.168.2.235/8001
 ```
 
 Compiled using:

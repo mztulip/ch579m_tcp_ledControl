@@ -83,11 +83,19 @@ static void tcp_connection_error(void *arg, err_t err)
   printf("\n\rtcp connection fatal Error. Maybe memory shortage.");
 }
 
+static err_t tcp_connection_poll(void *arg, struct tcp_pcb *tpcb)
+{
+    printf("\n\rTCP poll. Aborting connection.");
+    tcp_abort(tpcb);
+    return ERR_ABRT;
+}
+
 static err_t tcp_connection_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
     printf("\n\rConnection accepted.");
     tcp_recv(newpcb, tcp_data_received);
     tcp_err(newpcb, tcp_connection_error);
+    tcp_poll(newpcb, tcp_connection_poll, 0);
 }
 
 // Very helpful link https://lwip.fandom.com/wiki/Raw/TCP
