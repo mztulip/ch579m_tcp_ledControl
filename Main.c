@@ -63,9 +63,25 @@ void led_off(void)
     
 //     pbuf_free(p);
 // }
+
+static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
+{
+    printf("\n\tData received.");
+
+    if (p == NULL)
+    {
+        printf("Closing connection");
+    }
+    else if(err != ERR_OK)
+    {
+        printf("\n\rReceived error.");
+    }
+}
+
 static err_t tcp_connection_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
-
+    printf("\n\rConnection accepted.");
+    tcp_recv(newpcb, tcp_data_received);
 }
 
 // Very helpful link https://lwip.fandom.com/wiki/Raw/TCP
