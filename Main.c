@@ -33,39 +33,6 @@ void led_off(void)
     GPIOB_ResetBits( GPIO_Pin_0 );
 }
 
-// static void udp_received(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
-// {
-//     LWIP_UNUSED_ARG(arg);
-//     if(p == NULL)
-//         return;
-//     printf("\n\rgot udp");
-//     if (p->len == 1)
-//     {
-//         uint8_t *data = (uint8_t*)p->payload;
-//         char c = data[0];
-//         if(c == '1')
-//         {
-//             led_on();
-//             printf("\n\rLed enabled.");
-//         }
-//         else if(c == '0')
-//         {
-//             led_off();
-//             printf("\n\rLed disabled.");
-//         }
-//         else
-//         {
-//             printf("\n\rIncorrect state: %c", c);
-//         }
-//     }
-//     else
-//     {
-//         printf("\n\rIncorrect packet. Should contain char 0 or 1 with length=1 byte");
-//     }
-    
-//     pbuf_free(p);
-// }
-
 static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
 {
     printf("\033[32m Data received.\n\r\033[0m");
@@ -91,6 +58,29 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
         printf("%02x ", byte);
     }
     printf("\n\r");
+    if (p->len == 1)
+    {
+        uint8_t *data = (uint8_t*)p->payload;
+        char c = data[0];
+        if(c == '1')
+        {
+            led_on();
+            printf("\n\rLed enabled.");
+        }
+        else if(c == '0')
+        {
+            led_off();
+            printf("\n\rLed disabled.");
+        }
+        else
+        {
+            printf("\n\rIncorrect state: %c", c);
+        }
+    }
+    else
+    {
+        printf("\n\rIncorrect packet. Should contain char 0 or 1 with length=1 byte");
+    }
 
     tcp_recved(tpcb, p->tot_len);
     pbuf_free(p);
@@ -104,7 +94,8 @@ static void tcp_connection_error(void *arg, err_t err)
 
 static err_t tcp_connection_poll(void *arg, struct tcp_pcb *tpcb)
 {
-    printf("\033[33mTCP poll\n\r\033[0m]");
+    printf("\033[33mTCP poll. Too long connection. Closing\n\r\033[0m]");
+    tcp_close(tpcb);
     return ERR_OK;
 }
 
@@ -131,10 +122,11 @@ int main()
     InitTimer0();
     uart_init();
     printf("\n\rTCP server example with led control.\n\r");
+    printf("Led can by enabled wneh '1' is received. Send '0' to disable.\n\r");
     lwip_comm_init(); 
 
     u16_t   port = 8001;
-    printf("Listening port: %d\nr", port);
+    printf("Listening port: %d\n\r", port);
     static struct tcp_pcb *tcp_pcb_handle;
     err_t result;
     tcp_pcb_handle = tcp_new();
