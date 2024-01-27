@@ -78,10 +78,16 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
     }
 }
 
+static void tcp_connection_error(void *arg, err_t err)
+{
+  printf("\n\rtcp connection fatal Error. Maybe memory shortage.");
+}
+
 static err_t tcp_connection_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
     printf("\n\rConnection accepted.");
     tcp_recv(newpcb, tcp_data_received);
+    tcp_err(newpcb, tcp_connection_error);
 }
 
 // Very helpful link https://lwip.fandom.com/wiki/Raw/TCP
