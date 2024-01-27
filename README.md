@@ -9,7 +9,7 @@ chmod +x make.sh(if necessary)
 make.sh
 ```
 
-Led can be controlled using UDP packet.
+Led can be controlled using TCP packet.
 On Linux machine packets can be send as below:
 ```
 echo -n "1" > /dev/tcp/192.168.2.235/8001
