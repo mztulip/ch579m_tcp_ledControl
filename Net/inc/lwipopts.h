@@ -48,7 +48,7 @@
 #define LWIP_NETIF_LOOPBACK        0 //1
 #define LWIP_LOOPBACK_MAX_PBUFS    0 //10
 
-#define TCP_LISTEN_BACKLOG         0
+#define TCP_LISTEN_BACKLOG         1
 
 //#define LWIP_COMPAT_SOCKETS        1
 #define LWIP_SO_RCVTIMEO           1

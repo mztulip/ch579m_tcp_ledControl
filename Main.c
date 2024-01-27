@@ -63,7 +63,12 @@ void led_off(void)
     
 //     pbuf_free(p);
 // }
+static err_t tcp_connection_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
+{
 
+}
+
+// Very helpful link https://lwip.fandom.com/wiki/Raw/TCP
 int main()
 { 
 	SystemInit();
@@ -84,8 +89,15 @@ int main()
     err_t result;
     tcp_pcb_handle = tcp_new();
     if(tcp_pcb_handle == NULL){printf("\n\rtcp_new failed");goto exit;}
+
     result = tcp_bind(tcp_pcb_handle, IP_ADDR_ANY, port);
-    if(result != ERR_OK) {printf("\n\tcp_bind failed");goto exit;}
+    if(result != ERR_OK) 
+    {printf("\n\tcp_bind failed");memp_free(MEMP_TCP_PCB, tcp_pcb_handle);goto exit;}
+
+    tcp_pcb_handle = tcp_listen(tcp_pcb_handle);
+    if(tcp_pcb_handle == NULL){printf("\n\tcp_listen failed");memp_free(MEMP_TCP_PCB, tcp_pcb_handle);goto exit;}
+      
+    tcp_accept(tcp_pcb_handle, tcp_connection_accept);
 
     exit:
     while(1)
