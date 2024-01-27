@@ -40,7 +40,7 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
     // Remote client closes connection
     if (p == NULL)
     {
-        printf("p==NULL,Closing connection, request client\n\r");
+        printf("Closing connection, request client\n\r");
         tcp_close(tpcb);
 
         return ERR_OK;
