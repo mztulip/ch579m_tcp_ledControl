@@ -38,11 +38,11 @@
 
 #define LWIP_COMPAT_MUTEX          1
 
-#define LWIP_IGMP                  0 //1
+#define LWIP_IGMP                  0
 #define LWIP_ICMP                  1
-#define LWIP_SNMP                  0 //1
+#define LWIP_SNMP                  0 
 
-#define LWIP_DNS                   0  //1
+#define LWIP_DNS                   0
 
 #define LWIP_HAVE_LOOPIF           0 //1
 #define LWIP_NETIF_LOOPBACK        0 //1
