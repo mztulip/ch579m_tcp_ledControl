@@ -65,21 +65,21 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
         if(c == '1')
         {
             led_on();
-            printf("\n\rLed enabled.");
+            printf("Led enabled.\n\r");
         }
         else if(c == '0')
         {
             led_off();
-            printf("\n\rLed disabled.");
+            printf("Led disabled.\n\r");
         }
         else
         {
-            printf("\n\rIncorrect state: %c", c);
+            printf("Incorrect state: %c\n\r", c);
         }
     }
     else
     {
-        printf("\n\rIncorrect packet. Should contain char 0 or 1 with length=1 byte");
+        printf("Incorrect data. Send character '0' or '1'\n\r");
     }
 
     tcp_recved(tpcb, p->tot_len);
