@@ -73,14 +73,17 @@ static err_t tcp_data_received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, 
     if (p == NULL)
     {
         printf("p==NULL,Closing connection\n\r");
-        return ERR_ABRT;
+        tcp_close(tpcb);
+}
+        return ERR_OK;
     }
     else if(err != ERR_OK)
     {
         printf("Received error.\n\r");
-        return ERR_ABRT;
+        return err;
     }
     printf("Received Data len: %d\n\r", p->tot_len);
+
 
     tcp_recved(tpcb, p->tot_len);
     pbuf_free(p);
@@ -94,7 +97,7 @@ static void tcp_connection_error(void *arg, err_t err)
 
 static err_t tcp_connection_poll(void *arg, struct tcp_pcb *tpcb)
 {
-    printf("\033[33mTCP poll\n\r\033");
+    printf("\033[33mTCP poll\n\r\033[0m]");
     return ERR_OK;
 }
 
